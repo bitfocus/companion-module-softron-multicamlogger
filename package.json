@@ -1,9 +1,9 @@
 {
 	"name": "softron-multicamlogger",
 	"version": "1.0.0",
-	"main": "main.js",
+	"main": "index.js",
+	"type": "module",
 	"scripts": {
-		"format": "prettier -w ."
 	},
 	"license": "MIT",
 	"repository": {
@@ -11,7 +11,8 @@
 		"url": "git+https://github.com/bitfocus/companion-module-softron-multicamlogger.git"
 	},
 	"dependencies": {
-		"@companion-module/base": "~1.5.1"
+		"@companion-module/base": "~1.5.1",
+		"got": "~13.0.0"
 	},
 	"devDependencies": {
 		"@companion-module/tools": "^1.4.1"
