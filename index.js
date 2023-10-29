@@ -1,70 +1,78 @@
 // Softron Multicam Logger
-// Peter Daniel 2023
+// Peter Daniel, 29/10/2023
 
-import { InstanceBase, Regex, runEntrypoint, InstanceStatus } from '@companion-module/base'
-// import { UpgradeScripts } from './upgrades.js'
+import {
+	InstanceBase,
+	Regex,
+	runEntrypoint,
+	InstanceStatus,
+} from '@companion-module/base'
 import { updateActions } from './actions.js'
-// import { updateFeedbacks } from './feedbacks.js'
+import { updateFeedbacks } from './feedbacks.js'
 import { updateVariables } from './variables.js'
 import got, { Options } from 'got'
 
 class MulticamLogger extends InstanceBase {
 	constructor(internal) {
 		super(internal)
-		
+
 		this.updateActions = updateActions.bind(this)
-		// this.updateFeedbacks = updateFeedbacks.bind(this)
+		this.updateFeedbacks = updateFeedbacks.bind(this)
 		// this.updatePresets = updatePresets.bind(this)
 		this.updateVariables = updateVariables.bind(this)
 	}
 
 	async init(config) {
 		console.log('init multicam logger')
+		this.updateStatus(InstanceStatus.Connecting, 'Waiting')
 		this.config = config
-		
+
 		this.gotOptions = new Options({
 			prefixUrl: 'http://' + this.config.host + ':' + this.config.port,
 			responseType: 'json',
 			throwHttpErrors: false,
 		})
-		
+
 		this.inputs = []
-		
-		// this.gotOptions.headers = {
-		// 	Accept: 'application/text',
-		// 	Connection: 'keep-alive'
-		// }
+		this.logging = false
+		this.pollTimer = null
+		this.status = []
 
-		
-		console.log(this.gotOptions)
+		console.log(this.config)
 
-		this.updateStatus(InstanceStatus.Ok)
+		// get list of inputs for dropdown
+		this.sendGetCommand('inputs')
 
 		this.updateActions() // export actions
-		// this.updateFeedbacks() // export feedbacks
+		this.updateFeedbacks() // export feedbacks
 		this.updateVariables() // export variable definitions
-		
+
+		this.setupPolling()
 	}
-	// When module gets deleted
+
 	async destroy() {
 		this.log('debug', 'destroy')
 	}
 
 	async configUpdated(config) {
 		let resetConnection = false
-		
+
 		if (this.config.host != config.host || this.config.port != config.port) {
 			resetConnection = true
 		}
-		
+
 		this.config = config
-		
+
 		if (resetConnection === true) {
-			this.gotOptions.prefixUrl = 'http://' + this.config.host + ':' + this.config.port
+			this.updateStatus(InstanceStatus.Connecting, 'Waiting')
+			this.gotOptions.prefixUrl =
+				'http://' + this.config.host + ':' + this.config.port
+			// update list of inputs for dropdown
+			this.sendGetCommand('inputs')
 		}
-		
-		console.log(this.gotOptions)
-		
+
+		this.setupPolling()
+		console.log(this.config)
 	}
 
 	// Return config fields for web config
@@ -77,6 +85,7 @@ class MulticamLogger extends InstanceBase {
 				width: 8,
 				default: '127.0.0.1',
 				regex: Regex.IP,
+				required: true,
 			},
 			{
 				type: 'textinput',
@@ -85,32 +94,146 @@ class MulticamLogger extends InstanceBase {
 				width: 4,
 				default: '8888',
 				regex: Regex.PORT,
+				required: true,
+			},
+			{
+				type: 'checkbox',
+				id: 'pollEnabled',
+				label: 'Enable Polling',
+				width: 4,
+				default: false,
+				tooltip: 'When enabled variables will be updated once per second',
 			},
 		]
 	}
-	
+
+	setupPolling() {
+		if (this.config.pollEnabled === true) {
+			console.log('start polling')
+			clearInterval(this.pollTimer)
+			this.pollTimer = setInterval(this._restPolling.bind(this), 1000)
+			this.log('info', 'Polling enabled')
+		} else {
+			console.log('stop polling')
+			clearInterval(this.pollTimer)
+			this.pollTimer = null
+			this.log('info', 'Polling disabled')
+		}
+	}
+
 	async sendGetCommand(GetURL) {
 		console.log(this.gotOptions.prefixUrl + GetURL)
 		// console.log('get: ' + GetURL)
 		let response
-	
+		let poll
+
 		try {
 			response = await got(GetURL, undefined, this.gotOptions)
-			if (response.statusCode == 200) {
-				this.updateStatus(InstanceStatus.Ok)
-				console.log(response.body)
-				return response.body
-			} else {
-				this.updateStatus(
-					InstanceStatus.UnknownError,
-					`Unexpected HTTP status code: ${response.statusCode} - ${response.body.error}`
-				)
-				this.log('warn', `Unexpected HTTP status code: ${response.statusCode} - ${response.body.error}`)
-				return null
-			}
+			poll = await got('status', undefined, this.gotOptions)
+		} catch (error) {
+			this.processError(error)
+			return
+		}
+		this.processResult(response)
+		this.processResult(poll)
+	}
+
+	async _restPolling() {
+		// console.log('poll now')
+		let response
+		try {
+			response = await got('status', undefined, this.gotOptions)
 		} catch (error) {
 			console.log(error.message)
-			return null
+			this.processError(error)
+			return
+		}
+		this.processResult(response)
+	}
+
+	processResult(response) {
+		// console.log(response.statusCode)
+		switch (response.statusCode) {
+			case 200:
+				// console.log('success')
+				this.updateStatus(InstanceStatus.Ok)
+				this.processData(response.requestUrl.pathname, response.body)
+				break
+			default:
+				console.log('unexpected http response code')
+				this.updateStatus(
+					InstanceStatus.UnknownError,
+					`Unexpected HTTP status code: ${response.statusCode}`
+				)
+				this.log(
+					'warn',
+					`Unexpected HTTP status code: ${response.statusCode} - ${response.body.error}`
+				)
+				break
+		}
+	}
+
+	processError(error) {
+		if (error !== null) {
+			if (error.code !== undefined) {
+				this.log('error', 'Connection failed (' + error.message + ')')
+			} else {
+				this.log('error', 'general HTTP failure')
+			}
+			this.updateStatus(InstanceStatus.Disconnected)
+		}
+	}
+
+	processData(pathname, body) {
+		// console.log(pathname)
+		// console.log(body)
+		// console.log(typeof body + body.length)
+		switch (pathname) {
+			case '/status':
+				// set variables from json body
+				if (typeof body == 'object') {
+					this.status = body
+					this.setVariableValues(this.status)
+				}
+				// add labels from inputs array
+				if (this.inputs.length > 0) {
+					this.setVariableValues({
+						previewLabel: this.inputs[this.status.preview].label,
+						programLabel: this.inputs[this.status.program].label,
+					})
+				}
+				// logging variable for feedback
+				this.logging = this.status.logging_state
+				this.checkFeedbacks()
+				break
+			case '/inputs':
+				if (typeof body == 'object' && body.length > 0) {
+					this.inputs = []
+					for (var i = 0; i < body.length; i++) {
+						this.inputs.push({ id: i, label: body[i] })
+					}
+					console.log(this.inputs)
+					this.log('info', body.length + ' inputs found')
+					this.updateActions()
+					this.updateFeedbacks()
+				}
+				break
+			case '/start':
+				if (typeof body == 'object') {
+					if (body['success'] === true) {
+						this.log('info', 'Logging Started')
+					}
+				}
+				break
+			case '/stop':
+				if (typeof body == 'object') {
+					if (body['success'] === true) {
+						this.log('info', 'Logging Stopped')
+					}
+				}
+				break
+			default:
+				break
 		}
 	}
 }
