@@ -7,7 +7,7 @@ You must enter the IP address of the computer running Multicam Logger in the mod
 
 Multicam Logger uses port 8888 for remote control, there is no need to change this setting unless you are using port forwarding.
 
-To enable the continuous updating of variables enable the Polling option. This will slightly increase network traffic and the load on Companion and Multicam Logger.
+To enable the continuous updating of variables use the Polling option. This will slightly increase network traffic and the load on Companion and Multicam Logger.
 
 ## Actions
 
