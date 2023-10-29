@@ -1,28 +1,70 @@
-const { combineRgb } = require('@companion-module/base')
+import { combineRgb } from '@companion-module/base'
 
-module.exports = async function (self) {
-	self.setFeedbackDefinitions({
-		ChannelState: {
-			name: 'Example Feedback',
+export function updateFeedbacks() {
+	// let feedbacks = {}
+
+	this.setFeedbackDefinitions({
+		loggingState: {
+			name: 'Logging State',
 			type: 'boolean',
-			label: 'Channel State',
+			label: 'Logging State',
 			defaultStyle: {
-				bgcolor: combineRgb(255, 0, 0),
+				bgcolor: combineRgb(0, 240, 0),
+				color: combineRgb(0, 0, 0),
+			},
+			options: [],
+			callback: (feedback) => {
+				if (this.logging == true) {
+					return true
+				} else {
+					return false
+				}
+			},
+		},
+		preview: {
+			name: 'Preview Input',
+			type: 'boolean',
+			label: 'Change button state when Preview Input matches',
+			defaultStyle: {
+				bgcolor: combineRgb(0, 240, 0),
 				color: combineRgb(0, 0, 0),
 			},
 			options: [
 				{
-					id: 'num',
-					type: 'number',
-					label: 'Test',
-					default: 5,
-					min: 0,
-					max: 10,
+					type: 'dropdown',
+					label: 'Input',
+					id: 'angle',
+					default: '0',
+					choices: this.inputs,
 				},
 			],
-			callback: (feedback) => {
-				console.log('Hello world!', feedback.options.num)
-				if (feedback.options.num > 5) {
+			callback: ({ options }) => {
+				if (options.angle == this.status['preview']) {
+					return true
+				} else {
+					return false
+				}
+			},
+		},
+		program: {
+			name: 'Program Input',
+			type: 'boolean',
+			label: 'Change button state when Program Input matches',
+			defaultStyle: {
+				bgcolor: combineRgb(240, 0, 0),
+				color: combineRgb(0, 0, 0),
+			},
+			options: [
+				{
+					type: 'dropdown',
+					label: 'Input',
+					id: 'angle',
+					default: '0',
+					choices: this.inputs,
+				},
+			],
+			callback: ({ options }) => {
+				if (options.angle == this.status['program']) {
 					return true
 				} else {
 					return false
