@@ -1,7 +1,7 @@
 {
 	"id": "softron-multicamlogger",
 	"name": "softron-multicamlogger",
-	"shortname": "multicamlogger",
+	"shortname": "MulticamLogger",
 	"description": "Control the Softron Multicam Logger application",
 	"version": "1.0.0",
 	"license": "MIT",
