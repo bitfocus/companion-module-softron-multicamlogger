@@ -51,7 +51,8 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	async destroy() {
-		this.log('debug', 'destroy')
+		this.pollTimer = null
+		console.log('Destroy ' + this.id)
 	}
 
 	async configUpdated(config) {
@@ -109,12 +110,12 @@ class MulticamLogger extends InstanceBase {
 
 	setupPolling() {
 		if (this.config.pollEnabled === true) {
-			console.log('start polling')
+			console.log('Start polling')
 			clearInterval(this.pollTimer)
 			this.pollTimer = setInterval(this._restPolling.bind(this), 1000)
 			this.log('info', 'Polling enabled')
 		} else {
-			console.log('stop polling')
+			console.log('Stop polling')
 			clearInterval(this.pollTimer)
 			this.pollTimer = null
 			this.log('info', 'Polling disabled')
@@ -131,6 +132,7 @@ class MulticamLogger extends InstanceBase {
 			response = await got(GetURL, undefined, this.gotOptions)
 			poll = await got('status', undefined, this.gotOptions)
 		} catch (error) {
+			this.log('warn', 'Send command error')
 			this.processError(error)
 			return
 		}
