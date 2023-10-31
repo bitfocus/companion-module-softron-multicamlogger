@@ -83,7 +83,7 @@ class MulticamLogger extends InstanceBase {
 				type: 'textinput',
 				id: 'host',
 				label: 'Target IP',
-				width: 8,
+				width: 4,
 				default: '127.0.0.1',
 				regex: Regex.IP,
 				required: true,
@@ -98,22 +98,37 @@ class MulticamLogger extends InstanceBase {
 				required: true,
 			},
 			{
+				type: 'static-text',
+				id: 'text',
+				label: '',
+				width: 4,
+			},
+			{
 				type: 'checkbox',
 				id: 'pollEnabled',
 				label: 'Enable Polling',
 				width: 4,
 				default: false,
-				tooltip: 'When enabled variables will be updated once per second',
+				tooltip: 'When enabled variables will be updated automatically',
+			},
+			{
+				type: 'number',
+				id: 'pollInterval',
+				label: 'Polling Interval (ms)',
+				width: 4,
+				default: 1000,
+				min: 10,
+				tooltip: 'Lower values will update variables more often and also increase the load on Companion and Multicam Logger',
 			},
 		]
 	}
 
 	setupPolling() {
 		if (this.config.pollEnabled === true) {
-			console.log('Start polling')
+			console.log('Start polling at ' + this.config.pollInterval + 'ms')
 			clearInterval(this.pollTimer)
-			this.pollTimer = setInterval(this._restPolling.bind(this), 1000)
-			this.log('info', 'Polling enabled')
+			this.pollTimer = setInterval(this._restPolling.bind(this), this.config.pollInterval)
+			this.log('info', 'Polling enabled at ' + this.config.pollInterval + 'ms')
 		} else {
 			console.log('Stop polling')
 			clearInterval(this.pollTimer)
