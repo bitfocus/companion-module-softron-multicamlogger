@@ -3,7 +3,7 @@
 This module will control the [Softron Multicam Logger](https://softron.tv/products/record/multicam-logger) application. To use this module the 'HTTP Remote Control' option must be ticked in the Multicam Logger application settings dialog. 
 
 ## Configuration
-You must enter the IP address of the computer running Multicam Logger in the module configutation. If it is running on the same computer as Companion use 127.0.0.1
+You must enter the IP address of the computer running Multicam Logger in the module configuration. If it is running on the same computer as Companion use 127.0.0.1
 
 Multicam Logger uses port 8888 for remote control, there is no need to change this setting unless you are using port forwarding.
 
