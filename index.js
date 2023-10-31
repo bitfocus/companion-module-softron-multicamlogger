@@ -1,12 +1,7 @@
 // Softron Multicam Logger
 // Peter Daniel, 29/10/2023
 
-import {
-	InstanceBase,
-	Regex,
-	runEntrypoint,
-	InstanceStatus,
-} from '@companion-module/base'
+import { InstanceBase, Regex, runEntrypoint, InstanceStatus } from '@companion-module/base'
 import { updateActions } from './actions.js'
 import { updateFeedbacks } from './feedbacks.js'
 import { updateVariables } from './variables.js'
@@ -51,7 +46,11 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	async destroy() {
-		this.pollTimer = null
+		if (this.pollTimer != null) {
+			clearInterval(this.pollTimer)
+			this.pollTimer = null
+			console.log('Polling stopped')
+		}
 		console.log('Destroy ' + this.id)
 	}
 
@@ -66,8 +65,7 @@ class MulticamLogger extends InstanceBase {
 
 		if (resetConnection === true) {
 			this.updateStatus(InstanceStatus.Connecting, 'Waiting')
-			this.gotOptions.prefixUrl =
-				'http://' + this.config.host + ':' + this.config.port
+			this.gotOptions.prefixUrl = 'http://' + this.config.host + ':' + this.config.port
 			// update list of inputs for dropdown
 			this.sendGetCommand('inputs')
 		}
@@ -118,7 +116,8 @@ class MulticamLogger extends InstanceBase {
 				width: 4,
 				default: 1000,
 				min: 10,
-				tooltip: 'Lower values will update variables more often and also increase the load on Companion and Multicam Logger',
+				tooltip:
+					'Lower values will update variables more often and also increase the load on Companion and Multicam Logger',
 			},
 		]
 	}
@@ -178,14 +177,8 @@ class MulticamLogger extends InstanceBase {
 				break
 			default:
 				console.log('unexpected http response code')
-				this.updateStatus(
-					InstanceStatus.UnknownError,
-					`Unexpected HTTP status code: ${response.statusCode}`
-				)
-				this.log(
-					'warn',
-					`Unexpected HTTP status code: ${response.statusCode} - ${response.body.error}`
-				)
+				this.updateStatus(InstanceStatus.UnknownError, `Unexpected HTTP status code: ${response.statusCode}`)
+				this.log('warn', `Unexpected HTTP status code: ${response.statusCode} - ${response.body.error}`)
 				break
 		}
 	}
