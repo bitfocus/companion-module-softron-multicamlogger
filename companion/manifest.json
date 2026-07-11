@@ -3,17 +3,21 @@
 	"name": "softron-multicamlogger",
 	"shortname": "MulticamLogger",
 	"description": "Control the Softron Multicam Logger application",
-	"version": "1.0.0",
+	"version": "2.0.0",
 	"license": "MIT",
 	"repository": "git+https://github.com/bitfocus/companion-module-softron-multicamlogger.git",
 	"bugs": "https://github.com/bitfocus/companion-module-softron-multicamlogger/issues",
 	"maintainers": [
 		{
 			"name": "Peter Daniel"
+		},
+		{
+			"name": "Bart Snakenborg",
+			"email": "bartsnak@gmail.com"
 		}
 	],
 	"runtime": {
-		"type": "node18",
+		"type": "node22",
 		"api": "nodejs-ipc",
 		"apiVersion": "0.0.0",
 		"entrypoint": "../index.js"
@@ -21,5 +25,5 @@
 	"legacyIds": [],
 	"manufacturer": "Softron",
 	"products": ["Multicam Logger"],
-	"keywords": [ "Logging", "Multicam", "Production", "Vision Mixer" ]
+	"keywords": ["Logging", "Multicam", "Production", "Vision Mixer"]
 }
