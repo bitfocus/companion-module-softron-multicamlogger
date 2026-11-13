@@ -85,7 +85,7 @@ export function updateActions() {
 			},
 		],
 		callback: ({ options }) => {
-			this.sendGetCommand('add_marker?name=' + options.markerText)
+			this.sendGetCommand('add_marker?name=' + encodeURIComponent(options.markerText))
 		},
 	}
 
