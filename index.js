@@ -205,8 +205,8 @@ class MulticamLogger extends InstanceBase {
 				// add labels from inputs array
 				if (this.inputs.length > 0) {
 					this.setVariableValues({
-						previewLabel: this.inputs[this.status.preview].label,
-						programLabel: this.inputs[this.status.program].label,
+						previewLabel: this.inputs[this.status.preview]?.label ?? '',
+						programLabel: this.inputs[this.status.program]?.label ?? '',
 					})
 				}
 				// logging variable for feedback
