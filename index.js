@@ -195,16 +195,13 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	processData(pathname, body) {
-		// console.log(pathname)
-		// console.log(body)
-		// console.log(typeof body + body.length)
+		console.log(pathname)
+		console.log(body)
 		switch (pathname) {
 			case '/status':
 				// set variables from json body
-				if (typeof body == 'object') {
-					this.status = body
-					this.setVariableValues(this.status)
-				}
+				this.status = body
+				this.setVariableValues(this.status)
 				// add labels from inputs array
 				if (this.inputs.length > 0) {
 					this.setVariableValues({

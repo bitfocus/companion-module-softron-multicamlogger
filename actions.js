@@ -81,7 +81,7 @@ export function updateActions() {
 				label: 'Marker Text',
 				id: 'markerText',
 				default: '',
-				tooltip: 'Makers can only be added when logging is running',
+				description: 'Makers can only be added when logging is running',
 			},
 		],
 		callback: ({ options }) => {

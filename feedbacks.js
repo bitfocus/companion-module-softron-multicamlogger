@@ -7,7 +7,6 @@ export function updateFeedbacks() {
 		loggingState: {
 			name: 'Logging State',
 			type: 'boolean',
-			label: 'Logging State',
 			defaultStyle: {
 				bgcolor: combineRgb(0, 240, 0),
 				color: combineRgb(0, 0, 0),
@@ -24,7 +23,6 @@ export function updateFeedbacks() {
 		preview: {
 			name: 'Preview Input',
 			type: 'boolean',
-			label: 'Change button state when Preview Input matches',
 			defaultStyle: {
 				bgcolor: combineRgb(0, 240, 0),
 				color: combineRgb(0, 0, 0),

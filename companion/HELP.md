@@ -35,3 +35,6 @@ Status information sent by the Multicam Logger application is stored in variable
 
 ### 1.0.0
 First Release, tested with Multicam Logger version 2.2.7
+
+### 2.0.0
+Updated for Companion v5
