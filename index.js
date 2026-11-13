@@ -81,7 +81,6 @@ class MulticamLogger extends InstanceBase {
 				type: 'textinput',
 				id: 'host',
 				label: 'Target IP',
-				width: 4,
 				default: '127.0.0.1',
 				regex: Regex.IP,
 				required: true,
@@ -90,33 +89,24 @@ class MulticamLogger extends InstanceBase {
 				type: 'textinput',
 				id: 'port',
 				label: 'Target Port',
-				width: 4,
 				default: '8888',
 				regex: Regex.PORT,
 				required: true,
 			},
 			{
-				type: 'static-text',
-				id: 'text',
-				label: '',
-				width: 4,
-			},
-			{
 				type: 'checkbox',
 				id: 'pollEnabled',
 				label: 'Enable Polling',
-				width: 4,
 				default: false,
-				tooltip: 'When enabled variables will be updated automatically',
+				description: 'When enabled variables will be updated automatically',
 			},
 			{
 				type: 'number',
 				id: 'pollInterval',
 				label: 'Polling Interval (ms)',
-				width: 4,
 				default: 1000,
 				min: 10,
-				tooltip:
+				description:
 					'Lower values will update variables more often and also increase the load on Companion and Multicam Logger',
 			},
 		]
