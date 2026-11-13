@@ -195,8 +195,8 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	processData(pathname, body) {
-		console.log(pathname)
-		console.log(body)
+		// console.log(pathname)
+		// console.log(body)
 		switch (pathname) {
 			case '/status':
 				// set variables from json body
