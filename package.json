@@ -10,10 +10,10 @@
 		"url": "git+https://github.com/bitfocus/companion-module-softron-multicamlogger.git"
 	},
 	"dependencies": {
-		"@companion-module/base": "~1.14.0",
+		"@companion-module/base": "~1.15.1",
 		"got": "~16.2.0"
 	},
 	"devDependencies": {
-		"@companion-module/tools": "^2.8.0"
+		"@companion-module/tools": "^2.9.0"
 	}
 }
