@@ -48,7 +48,7 @@ export function updateActions() {
 				type: 'dropdown',
 				label: 'Input',
 				id: 'angle',
-				default: '0',
+				default: 0,
 				choices: this.inputs,
 			},
 		],
@@ -64,7 +64,7 @@ export function updateActions() {
 				type: 'dropdown',
 				label: 'Input',
 				id: 'angle',
-				default: '0',
+				default: 0,
 				choices: this.inputs,
 			},
 		],
@@ -82,9 +82,11 @@ export function updateActions() {
 				id: 'markerText',
 				default: '',
 				description: 'Markers can only be added when logging is running',
+				useVariables: true,
 			},
 		],
 		callback: ({ options }) => {
+			this.log('debug', 'markerText raw: ' + JSON.stringify(options.markerText))
 			this.sendGetCommand('add_marker?name=' + encodeURIComponent(options.markerText))
 		},
 	}
