@@ -11,7 +11,7 @@ To enable the continuous updating of variables use the Polling option. This will
 
 ## Actions
 
-- **Add Marker** add a text note to the log. This action will only work when logging is in the running state. Variables maybe used.
+- **Add Marker** add a text note to the log. This action will only work when logging is in the running state.
 - **Change Angle (Take)** Swap Program and Preview
 - **Set Preview** Choose the angle for Preview. The list of available inputs should update when the module is started.
 - **Set Program** Choose the angle for Program. The list of available inputs should update when the module is started.
