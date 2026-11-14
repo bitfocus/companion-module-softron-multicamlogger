@@ -26,9 +26,6 @@ export function updatePresets() {
 		feedbacks: [
 			{
 				feedbackId: 'loggingState',
-				options: {
-					loggingState: true,
-				},
 				style: {
 					bgcolor: combineRgb(0, 204, 0),
 					color: combineRgb(255, 255, 255),
@@ -154,7 +151,7 @@ export function updatePresets() {
 			],
 		}
 	}
-	
+
 	for (var input = 0; input < this.inputs.length; input++) {
 		presets['pvw' + input] = {
 			type: 'button',
