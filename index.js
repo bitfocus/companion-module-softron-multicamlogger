@@ -67,11 +67,11 @@ class MulticamLogger extends InstanceBase {
 		this.config = config
 
 		if (resetConnection === true) {
+			this.connectionOk = undefined
 			this.updateStatus(InstanceStatus.Connecting, 'Waiting')
 			this.gotOptions.prefixUrl = 'http://' + this.config.host + ':' + this.config.port
 			// update list of inputs for dropdown
 			this.sendGetCommand('inputs')
-			this.connectionOk = undefined
 		}
 
 		this.setupPolling()
@@ -159,12 +159,12 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	processResult(response) {
+		this.connectionOk = true
 		switch (response.statusCode) {
 			case 200:
 				if (this.connectionOk === false) {
 					this.log('info', 'Connection restored')
 				}
-				this.connectionOk = true
 				this.updateStatus(InstanceStatus.Ok)
 				this.processData(response.requestUrl.pathname, response.body)
 				break
@@ -182,7 +182,7 @@ class MulticamLogger extends InstanceBase {
 			if (error?.code !== undefined) {
 				this.log('error', 'Connection failed (' + error.message + ')')
 			} else {
-				this.log('error', 'general HTTP failure')
+				this.log('error', 'general HTTP failure (' + error.message + ')')
 			}
 			this.updateStatus(InstanceStatus.ConnectionFailure)
 			this.connectionOk = false
@@ -207,18 +207,24 @@ class MulticamLogger extends InstanceBase {
 				this.checkFeedbacks()
 				break
 			case '/inputs':
-				if (typeof body == 'object' && body.length > 0) {
-					this.inputs = []
-					for (var i = 0; i < body.length; i++) {
-						this.inputs.push({ id: i, label: body[i] })
-					}
-					this.log('debug', this.inputs)
+				// if (typeof body == 'object' && body.length > 0) {
+				// 	this.inputs = []
+				// 	for (var i = 0; i < body.length; i++) {
+				// 		this.inputs.push({ id: i, label: body[i] })
+				// 	}
+				// 	this.log('debug', this.inputs)
+				// 	this.log('info', body.length + ' inputs found')
+				// 	this.updateActions()
+				// 	this.updateFeedbacks()
+				// }
+				// if (typeof body == 'object' && body.length == 0) {
+				// 	this.inputs = []
+				// 	this.updateActions()
+				// 	this.updateFeedbacks()
+				// }
+				if (Array.isArray(body)) {
+					this.inputs = body.map((label, id) => ({ id, label }))
 					this.log('info', body.length + ' inputs found')
-					this.updateActions()
-					this.updateFeedbacks()
-				}
-				if (typeof body == 'object' && body.length == 0) {
-					this.inputs = []
 					this.updateActions()
 					this.updateFeedbacks()
 				}
