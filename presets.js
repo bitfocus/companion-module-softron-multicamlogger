@@ -103,101 +103,59 @@ export function updatePresets() {
 		feedbacks: [],
 	}
 
-	for (var input = 0; input < this.inputs.length; input++) {
-		presets['pgm' + input] = {
-			type: 'button',
-			category: 'Program Bus',
-			name: input + 1,
-			style: {
-				text: input + 1,
-				size: 'auto',
-				bgcolor: combineRgb(0, 0, 0),
-				color: combineRgb(255, 255, 255),
-			},
-			steps: [
-				{
-					down: [
-						{
-							actionId: 'set_program',
-							options: {
-								angle: input,
-							},
-						},
-					],
-					up: [],
-				},
-			],
-			feedbacks: [
-				{
-					feedbackId: 'program',
-					options: {
-						angle: input,
-					},
-					style: {
-						bgcolor: combineRgb(204, 0, 0),
-						color: combineRgb(255, 255, 255),
-					},
-				},
-				{
-					feedbackId: 'preview',
-					options: {
-						angle: input,
-					},
-					style: {
-						bgcolor: combineRgb(0, 204, 0),
-						color: combineRgb(255, 255, 255),
-					},
-				},
-			],
-		}
-	}
+	const buses = [
+		['pgm', 'Program Bus', 'set_program'],
+		['pvw', 'Preview Bus', 'set_preview'],
+	]
 
-	for (var input = 0; input < this.inputs.length; input++) {
-		presets['pvw' + input] = {
-			type: 'button',
-			category: 'Preview Bus',
-			name: input + 1,
-			style: {
-				text: input + 1,
-				size: 'auto',
-				bgcolor: combineRgb(0, 0, 0),
-				color: combineRgb(255, 255, 255),
-			},
-			steps: [
-				{
-					down: [
-						{
-							actionId: 'set_preview',
-							options: {
-								angle: input,
+	for (const [prefix, category, actionId] of buses) {
+		for (let input = 0; input < this.inputs.length; input++) {
+			presets[prefix + input] = {
+				type: 'button',
+				category: category,
+				name: String(input + 1),
+				style: {
+					text: String(input + 1),
+					size: 'auto',
+					bgcolor: combineRgb(0, 0, 0),
+					color: combineRgb(255, 255, 255),
+				},
+				steps: [
+					{
+						down: [
+							{
+								actionId: actionId,
+								options: {
+									angle: input,
+								},
 							},
+						],
+						up: [],
+					},
+				],
+				feedbacks: [
+					{
+						feedbackId: 'program',
+						options: {
+							angle: input,
 						},
-					],
-					up: [],
-				},
-			],
-			feedbacks: [
-				{
-					feedbackId: 'program',
-					options: {
-						angle: input,
+						style: {
+							bgcolor: combineRgb(204, 0, 0),
+							color: combineRgb(255, 255, 255),
+						},
 					},
-					style: {
-						bgcolor: combineRgb(204, 0, 0),
-						color: combineRgb(255, 255, 255),
+					{
+						feedbackId: 'preview',
+						options: {
+							angle: input,
+						},
+						style: {
+							bgcolor: combineRgb(0, 204, 0),
+							color: combineRgb(255, 255, 255),
+						},
 					},
-				},
-				{
-					feedbackId: 'preview',
-					options: {
-						angle: input,
-					},
-					style: {
-						bgcolor: combineRgb(0, 204, 0),
-						color: combineRgb(255, 255, 255),
-					},
-				},
-			],
+				],
+			}
 		}
 	}
 
