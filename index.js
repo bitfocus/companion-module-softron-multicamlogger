@@ -159,16 +159,22 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	processResult(response) {
-		this.connectionOk = true
+		
 		switch (response.statusCode) {
 			case 200:
 				if (this.connectionOk === false) {
+			 		// change from error to okay				
 					this.log('info', 'Connection restored')
+					this.connectionOk = true
+					// reload the dropdowns
+					this.sendGetCommand('inputs') 
 				}
+				this.connectionOk = true
 				this.updateStatus(InstanceStatus.Ok)
 				this.processData(response.requestUrl.pathname, response.body)
 				break
 			default:
+				this.connectionOk = true // the server answered, so it's reachable
 				this.log('warn', 'unexpected http response code')
 				this.updateStatus(InstanceStatus.UnknownError, `Unexpected HTTP status code: ${response.statusCode}`)
 				this.log('warn', `Unexpected HTTP status code: ${response.statusCode} - ${response.body.error}`)
