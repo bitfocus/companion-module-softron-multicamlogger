@@ -34,6 +34,7 @@ class MulticamLogger extends InstanceBase {
 		this.logging = false
 		this.pollTimer = null
 		this.status = []
+		this.connectionOk = undefined
 
 		this.log('debug', this.config)
 
@@ -70,6 +71,7 @@ class MulticamLogger extends InstanceBase {
 			this.gotOptions.prefixUrl = 'http://' + this.config.host + ':' + this.config.port
 			// update list of inputs for dropdown
 			this.sendGetCommand('inputs')
+			this.connectionOk = undefined
 		}
 
 		this.setupPolling()
@@ -150,7 +152,6 @@ class MulticamLogger extends InstanceBase {
 		try {
 			response = await got('status', undefined, this.gotOptions)
 		} catch (error) {
-			this.log('error', error.message)
 			this.processError(error)
 			return
 		}
@@ -160,6 +161,10 @@ class MulticamLogger extends InstanceBase {
 	processResult(response) {
 		switch (response.statusCode) {
 			case 200:
+				if (this.connectionOk === false) {
+					this.log('info', 'Connection restored')
+				}
+				this.connectionOk = true
 				this.updateStatus(InstanceStatus.Ok)
 				this.processData(response.requestUrl.pathname, response.body)
 				break
@@ -172,13 +177,15 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	processError(error) {
-		if (error !== null) {
-			if (error.code !== undefined) {
+		if (this.connectionOk !== false) {
+			// only process it once
+			if (error?.code !== undefined) {
 				this.log('error', 'Connection failed (' + error.message + ')')
 			} else {
 				this.log('error', 'general HTTP failure')
 			}
 			this.updateStatus(InstanceStatus.ConnectionFailure)
+			this.connectionOk = false
 		}
 	}
 
