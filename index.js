@@ -36,7 +36,7 @@ class MulticamLogger extends InstanceBase {
 		this.status = []
 		this.connectionOk = undefined
 
-		this.log('debug', this.config)
+		this.log('debug', JSON.stringify(this.config))
 
 		// get list of inputs for dropdown
 		this.sendGetCommand('inputs')
@@ -75,7 +75,7 @@ class MulticamLogger extends InstanceBase {
 		}
 
 		this.setupPolling()
-		this.log('debug', this.config)
+		this.log('debug', JSON.stringify(this.config))
 	}
 
 	// Return config fields for web config
@@ -212,7 +212,7 @@ class MulticamLogger extends InstanceBase {
 				// 	for (var i = 0; i < body.length; i++) {
 				// 		this.inputs.push({ id: i, label: body[i] })
 				// 	}
-				// 	this.log('debug', this.inputs)
+				// 	this.log('debug', JSON.stringify(this.inputs))
 				// 	this.log('info', body.length + ' inputs found')
 				// 	this.updateActions()
 				// 	this.updateFeedbacks()
@@ -225,6 +225,7 @@ class MulticamLogger extends InstanceBase {
 				if (Array.isArray(body)) {
 					this.inputs = body.map((label, id) => ({ id, label }))
 					this.log('info', body.length + ' inputs found')
+					this.log('debug', JSON.stringify(this.inputs))
 					this.updateActions()
 					this.updateFeedbacks()
 				}
@@ -232,14 +233,14 @@ class MulticamLogger extends InstanceBase {
 			case '/start':
 				if (typeof body == 'object') {
 					if (body['success'] === true) {
-						this.log('info', 'Logging Started')
+						this.log('info', 'Multicam Logging Started')
 					}
 				}
 				break
 			case '/stop':
 				if (typeof body == 'object') {
 					if (body['success'] === true) {
-						this.log('info', 'Logging Stopped')
+						this.log('info', 'Multicam Logging Stopped')
 					}
 				}
 				break
