@@ -31,6 +31,9 @@ To ensure that the preview and program feedbacks update when changes are made ou
 ## Variables
 Status information sent by the Multicam Logger application is stored in variables. If the polling config option is enabled then these variables are updated once per second, otherwise they are updated only on startup and when a command is sent.
 
+## Presets
+Program and Preview presets are created based on the number of inputs defined in Multicam Logger.
+
 ## Version History
 
 ### 1.0.0
@@ -38,3 +41,7 @@ First Release, tested with Multicam Logger version 2.2.7
 
 ### 1.1.0
 Updates and bug fixes, tested with Multicam Logger version 2.2.8
+
+### 1.2.0
+Add presets
+Internal changes to improve reliability and deal with error conditions
