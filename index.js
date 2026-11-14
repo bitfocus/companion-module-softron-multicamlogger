@@ -89,7 +89,7 @@ class MulticamLogger extends InstanceBase {
 				id: 'host',
 				label: 'Target IP',
 				default: '127.0.0.1',
-				regex: Regex.IP,
+				regex: Regex.HOSTNAME,
 				required: true,
 			},
 			{
@@ -155,7 +155,7 @@ class MulticamLogger extends InstanceBase {
 		// avoid overlapping polls
 		if (this.polling) return
 		this.polling = true
-		
+
 		let response
 		try {
 			response = await got('status', undefined, this.gotOptions)
@@ -169,15 +169,14 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	processResult(response) {
-		
 		switch (response.statusCode) {
 			case 200:
 				if (this.connectionOk === false) {
-			 		// change from error to okay				
+					// change from error to okay
 					this.log('info', 'Connection restored')
 					this.connectionOk = true
 					// reload the dropdowns
-					this.sendGetCommand('inputs') 
+					this.sendGetCommand('inputs')
 				}
 				this.connectionOk = true
 				this.updateStatus(InstanceStatus.Ok)
@@ -205,63 +204,48 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	processData(pathname, body) {
-		switch (pathname) {
-			case '/status':
-				// set variables from json body
-				this.status = body
-				this.setVariableValues(this.status)
-				// add labels from inputs array
-				if (this.inputs.length > 0) {
-					this.setVariableValues({
-						previewLabel: this.inputs[this.status.preview]?.label ?? '',
-						programLabel: this.inputs[this.status.program]?.label ?? '',
-					})
-				}
-				// logging variable for feedback
-				this.logging = this.status.logging_state
-				this.checkFeedbacks()
-				break
-			case '/inputs':
-				// if (typeof body == 'object' && body.length > 0) {
-				// 	this.inputs = []
-				// 	for (var i = 0; i < body.length; i++) {
-				// 		this.inputs.push({ id: i, label: body[i] })
-				// 	}
-				// 	this.log('debug', JSON.stringify(this.inputs))
-				// 	this.log('info', body.length + ' inputs found')
-				// 	this.updateActions()
-				// 	this.updateFeedbacks()
-				// }
-				// if (typeof body == 'object' && body.length == 0) {
-				// 	this.inputs = []
-				// 	this.updateActions()
-				// 	this.updateFeedbacks()
-				// }
-				if (Array.isArray(body)) {
-					this.inputs = body.map((label, id) => ({ id, label }))
-					this.log('info', body.length + ' inputs found')
-					this.log('debug', JSON.stringify(this.inputs))
-					this.updateActions()
-					this.updateFeedbacks()
-					this.updatePresets()
-				}
-				break
-			case '/start':
-				if (typeof body == 'object') {
+		if (typeof body === 'object' && body !== null) {
+			switch (pathname) {
+				case '/status':
+					// set variables from json body
+					this.status = body
+					this.setVariableValues(this.status)
+					// add labels from inputs array
+					if (this.inputs.length > 0) {
+						this.setVariableValues({
+							previewLabel: this.inputs[this.status.preview]?.label ?? '',
+							programLabel: this.inputs[this.status.program]?.label ?? '',
+						})
+					}
+					// logging variable for feedback
+					this.logging = this.status.logging_state
+					this.checkFeedbacks()
+					break
+				case '/inputs':
+					if (Array.isArray(body)) {
+						this.inputs = body.map((label, id) => ({ id, label }))
+						this.log('info', body.length + ' inputs found')
+						this.log('debug', JSON.stringify(this.inputs))
+						this.updateActions()
+						this.updateFeedbacks()
+						this.updatePresets()
+					}
+					break
+				case '/start':
 					if (body['success'] === true) {
 						this.log('info', 'Multicam Logging Started')
 					}
-				}
-				break
-			case '/stop':
-				if (typeof body == 'object') {
+					break
+				case '/stop':
 					if (body['success'] === true) {
 						this.log('info', 'Multicam Logging Stopped')
 					}
-				}
-				break
-			default:
-				break
+					break
+				default:
+					break
+			}
+		} else {
+			this.log('warn', 'Body is null or not an object')
 		}
 	}
 }
