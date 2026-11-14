@@ -111,6 +111,7 @@ class MulticamLogger extends InstanceBase {
 				label: 'Polling Interval (ms)',
 				default: 1000,
 				min: 100,
+				max: 60000,
 				description:
 					'Lower values will update variables more often and also increase the load on Companion and Multicam Logger',
 			},
