@@ -4,6 +4,7 @@
 import { InstanceBase, Regex, runEntrypoint, InstanceStatus } from '@companion-module/base'
 import { updateActions } from './actions.js'
 import { updateFeedbacks } from './feedbacks.js'
+import { updatePresets } from './presets.js'
 import { updateVariables } from './variables.js'
 import got, { Options } from 'got'
 
@@ -13,7 +14,7 @@ class MulticamLogger extends InstanceBase {
 
 		this.updateActions = updateActions.bind(this)
 		this.updateFeedbacks = updateFeedbacks.bind(this)
-		// this.updatePresets = updatePresets.bind(this)
+		this.updatePresets = updatePresets.bind(this)
 		this.updateVariables = updateVariables.bind(this)
 	}
 
@@ -44,6 +45,7 @@ class MulticamLogger extends InstanceBase {
 
 		this.updateActions() // export actions
 		this.updateFeedbacks() // export feedbacks
+		this.updatePresets() // presets
 		this.updateVariables() // export variable definitions
 
 		this.setupPolling()
@@ -133,7 +135,7 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	async sendGetCommand(GetURL) {
-		this.log('debug', this.gotOptions.prefixUrl + '/' + GetURL)
+		this.log('debug', this.gotOptions.prefixUrl + GetURL)
 		let response
 		let poll
 
@@ -241,6 +243,7 @@ class MulticamLogger extends InstanceBase {
 					this.log('debug', JSON.stringify(this.inputs))
 					this.updateActions()
 					this.updateFeedbacks()
+					this.updatePresets()
 				}
 				break
 			case '/start':
