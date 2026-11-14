@@ -35,6 +35,7 @@ class MulticamLogger extends InstanceBase {
 		this.pollTimer = null
 		this.status = []
 		this.connectionOk = undefined
+		this.polling = false
 
 		this.log('debug', JSON.stringify(this.config))
 
@@ -148,13 +149,18 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	async _restPolling() {
+		// avoid overlapping polls
+		if (this.polling) return
+		
 		let response
 		try {
+			this.polling = true
 			response = await got('status', undefined, this.gotOptions)
 		} catch (error) {
 			this.processError(error)
 			return
 		}
+		this.polling = false
 		this.processResult(response)
 	}
 
