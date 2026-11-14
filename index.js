@@ -18,7 +18,7 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	async init(config) {
-		console.log('init multicam logger')
+		this.log('debug', 'init multicam logger')
 		this.updateStatus(InstanceStatus.Connecting, 'Waiting')
 		this.config = config
 
@@ -35,7 +35,7 @@ class MulticamLogger extends InstanceBase {
 		this.pollTimer = null
 		this.status = []
 
-		console.log(this.config)
+		this.log('debug', this.config)
 
 		// get list of inputs for dropdown
 		this.sendGetCommand('inputs')
@@ -51,9 +51,9 @@ class MulticamLogger extends InstanceBase {
 		if (this.pollTimer != null) {
 			clearInterval(this.pollTimer)
 			this.pollTimer = null
-			console.log('Polling stopped')
+			this.log('debug', 'Polling stopped')
 		}
-		console.log('Destroy ' + this.id)
+		this.log('debug', 'Destroy ' + this.id)
 	}
 
 	async configUpdated(config) {
@@ -73,7 +73,7 @@ class MulticamLogger extends InstanceBase {
 		}
 
 		this.setupPolling()
-		console.log(this.config)
+		this.log('debug', this.config)
 	}
 
 	// Return config fields for web config
@@ -116,12 +116,12 @@ class MulticamLogger extends InstanceBase {
 
 	setupPolling() {
 		if (this.config.pollEnabled === true) {
-			console.log('Start polling at ' + this.config.pollInterval + 'ms')
+			this.log('debug', 'Start polling at ' + this.config.pollInterval + 'ms')
 			clearInterval(this.pollTimer)
 			this.pollTimer = setInterval(this._restPolling.bind(this), this.config.pollInterval)
 			this.log('info', 'Polling enabled at ' + this.config.pollInterval + 'ms')
 		} else {
-			console.log('Stop polling')
+			this.log('debug', 'Stop polling')
 			clearInterval(this.pollTimer)
 			this.pollTimer = null
 			this.log('info', 'Polling disabled')
@@ -129,8 +129,7 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	async sendGetCommand(GetURL) {
-		console.log(this.gotOptions.prefixUrl + GetURL)
-		// console.log('get: ' + GetURL)
+		this.log('debug', this.gotOptions.prefixUrl + GetURL)
 		let response
 		let poll
 
@@ -147,12 +146,11 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	async _restPolling() {
-		// console.log('poll now')
 		let response
 		try {
 			response = await got('status', undefined, this.gotOptions)
 		} catch (error) {
-			console.log(error.message)
+			this.log('error', error.message)
 			this.processError(error)
 			return
 		}
@@ -160,15 +158,13 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	processResult(response) {
-		// console.log(response.statusCode)
 		switch (response.statusCode) {
 			case 200:
-				// console.log('success')
 				this.updateStatus(InstanceStatus.Ok)
 				this.processData(response.requestUrl.pathname, response.body)
 				break
 			default:
-				console.log('unexpected http response code')
+				this.log('warn', 'unexpected http response code')
 				this.updateStatus(InstanceStatus.UnknownError, `Unexpected HTTP status code: ${response.statusCode}`)
 				this.log('warn', `Unexpected HTTP status code: ${response.statusCode} - ${response.body.error}`)
 				break
@@ -187,8 +183,6 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	processData(pathname, body) {
-		// console.log(pathname)
-		// console.log(body)
 		switch (pathname) {
 			case '/status':
 				// set variables from json body
@@ -211,8 +205,13 @@ class MulticamLogger extends InstanceBase {
 					for (var i = 0; i < body.length; i++) {
 						this.inputs.push({ id: i, label: body[i] })
 					}
-					console.log(this.inputs)
+					this.log('debug', this.inputs)
 					this.log('info', body.length + ' inputs found')
+					this.updateActions()
+					this.updateFeedbacks()
+				}
+				if (typeof body == 'object' && body.length == 0) {
+					this.inputs = []
 					this.updateActions()
 					this.updateFeedbacks()
 				}
