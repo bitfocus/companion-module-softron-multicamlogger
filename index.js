@@ -110,7 +110,7 @@ class MulticamLogger extends InstanceBase {
 				id: 'pollInterval',
 				label: 'Polling Interval (ms)',
 				default: 1000,
-				min: 10,
+				min: 100,
 				description:
 					'Lower values will update variables more often and also increase the load on Companion and Multicam Logger',
 			},
@@ -132,7 +132,7 @@ class MulticamLogger extends InstanceBase {
 	}
 
 	async sendGetCommand(GetURL) {
-		this.log('debug', this.gotOptions.prefixUrl + GetURL)
+		this.log('debug', this.gotOptions.prefixUrl + '/' + GetURL)
 		let response
 		let poll
 
@@ -151,16 +151,17 @@ class MulticamLogger extends InstanceBase {
 	async _restPolling() {
 		// avoid overlapping polls
 		if (this.polling) return
+		this.polling = true
 		
 		let response
 		try {
-			this.polling = true
 			response = await got('status', undefined, this.gotOptions)
 		} catch (error) {
 			this.processError(error)
 			return
+		} finally {
+			this.polling = false
 		}
-		this.polling = false
 		this.processResult(response)
 	}
 
@@ -181,9 +182,8 @@ class MulticamLogger extends InstanceBase {
 				break
 			default:
 				this.connectionOk = true // the server answered, so it's reachable
-				this.log('warn', 'unexpected http response code')
 				this.updateStatus(InstanceStatus.UnknownError, `Unexpected HTTP status code: ${response.statusCode}`)
-				this.log('warn', `Unexpected HTTP status code: ${response.statusCode} - ${response.body.error}`)
+				this.log('warn', `Unexpected HTTP status code: ${response.statusCode} - ${response.body?.error}`)
 				break
 		}
 	}
