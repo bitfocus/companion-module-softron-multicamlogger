@@ -26,6 +26,8 @@ class MulticamLogger extends InstanceBase {
 			prefixUrl: 'http://' + this.config.host + ':' + this.config.port,
 			responseType: 'json',
 			throwHttpErrors: false,
+			timeout: { request: 2000 },
+			retry: { limit: 0 },
 		})
 
 		this.inputs = []
@@ -180,7 +182,7 @@ class MulticamLogger extends InstanceBase {
 			} else {
 				this.log('error', 'general HTTP failure')
 			}
-			this.updateStatus(InstanceStatus.Disconnected)
+			this.updateStatus(InstanceStatus.ConnectionFailure)
 		}
 	}
 
