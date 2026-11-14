@@ -32,7 +32,7 @@ export function updateFeedbacks() {
 					type: 'dropdown',
 					label: 'Input',
 					id: 'angle',
-					default: '0',
+					default: 0,
 					choices: this.inputs,
 				},
 			],
@@ -47,7 +47,6 @@ export function updateFeedbacks() {
 		program: {
 			name: 'Program Input',
 			type: 'boolean',
-			label: 'Change button state when Program Input matches',
 			defaultStyle: {
 				bgcolor: combineRgb(240, 0, 0),
 				color: combineRgb(0, 0, 0),
@@ -57,7 +56,7 @@ export function updateFeedbacks() {
 					type: 'dropdown',
 					label: 'Input',
 					id: 'angle',
-					default: '0',
+					default: 0,
 					choices: this.inputs,
 				},
 			],
